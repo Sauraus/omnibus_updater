@@ -1,3 +1,7 @@
+v2.0.0
+======
+* Complete refactor of the cookbook to use Chef resources as much as possible
+
 v1.0.4
 ======
 * file_cache_path path to store chef-client

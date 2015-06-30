@@ -1,7 +1,23 @@
-.*
-!.gitignore
-!.kitchen.yml
-bin
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+pkg/
+
+# Berkshelf
+.vagrant
+/cookbooks
+Berksfile.lock
+
+# Bundler
 Gemfile.lock
-Cheffile.lock
-tmp*
+bin/*
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
+
+#IDE
+.idea/

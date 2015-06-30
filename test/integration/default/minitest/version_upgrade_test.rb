@@ -1,16 +1,13 @@
-require 'minitest/spec'
-require 'rexml/document'
-require 'open-uri'
+require 'minitest/autorun'
 
-describe_recipe 'omnibus_updater_test::version_upgrade' do
-  include MiniTest::Chef::Assertions
+describe_recipe 'omnibus_updater::default' do
 
   it "sets remote package location" do
     assert(node[:omnibus_updater][:full_url], "Failed to set URI for omnibus package")
   end
 
   it "downloads the package to the node" do
-    file("/opt/#{File.basename(node[:omnibus_updater][:full_url])}").must_exist
+    assert File.exists?("/opt/#{File.basename(node[:omnibus_updater][:full_url])}")
   end
 
   it "installs the proper version into the node" do
@@ -20,4 +17,5 @@ describe_recipe 'omnibus_updater_test::version_upgrade' do
       "Installed chef version does not match version requested"
     )
   end
+
 end
