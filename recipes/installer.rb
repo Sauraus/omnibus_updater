@@ -60,12 +60,14 @@ case File.extname(remote_path)
   else
     package 'chef' do
       action :upgrade
-      version node['omnibus_updater']['version']
+      allow_downgrade !node[:omnibus_updater][:prevent_downgrade] if node[:platfrom].eql? 'centos'
+      version node[:omnibus_updater][:version]
       source File.join(node[:omnibus_updater][:cache_dir], File.basename(remote_path))
+      provider value_for_platform_family(debian: Chef::Provider::Package::Dpkg)
       subscribes :create, resources(:remote_file => "omnibus_remote[#{File.basename(remote_path)}]"), :immediately
       notifies :restart, resources(:service => 'chef-client'), :immediately if node[:omnibus_updater][:restart_chef_service]
       notifies :create, resources(:ruby_block => 'omnibus chef killer'), :immediately
-      only_if { node['chef_packages']['chef']['version'] != node['omnibus_updater']['version'] }
+      only_if { node['chef_packages']['chef']['version'] != node[:omnibus_updater][:version] }
     end
 end
 
