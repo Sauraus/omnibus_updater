@@ -4,13 +4,24 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.3.0
+  data_path: test/shared
+  require_chef_omnibus: 12.4.0
 
 platforms:
   - name: centos-6.6
   - name: centos-7.0
   - name: ubuntu-12.04
   - name: ubuntu-14.04
+  - name: macosx-10.10
+    driver:
+      provider: vmware_fusion
+      box: macosx-10.10
+      box_url: http://your.servername.here/macosx-10.10.vmware.box
+  - name: winsrv-2012R2
+    driver:
+      provider: vmware_fusion
+      box: winsrv-2012R2
+      box_url: http://your.servername.here/windows_2012_r2_vmware.box
 
 suites:
   - name: upgrade
@@ -18,12 +29,12 @@ suites:
       recipe[omnibus_updater::default]
     attributes:
       omnibus_updater:
-        version: '12.4.0'
+        version: '12.4.3'
         kill_chef_on_upgrade: false
   - name: downgrade
     run_list:
       recipe[omnibus_updater::default]
     attributes:
       omnibus_updater:
-        version: '12.2.1'
+        version: '12.3.0'
         kill_chef_on_upgrade: false

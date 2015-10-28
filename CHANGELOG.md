@@ -1,6 +1,7 @@
 v2.0.0
 ======
 * Complete refactor of the cookbook to use Chef resources as much as possible
+* Cleanup most foodcritic warnings
 
 v1.0.4
 ======
