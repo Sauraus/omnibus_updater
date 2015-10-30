@@ -40,37 +40,36 @@ end
 case ::File.extname(remote_path)
   when '.sh'
     bash ::File.join(node['omnibus_updater']['cache_dir'], ::File.basename(remote_path)) do
-      action :run
+      action :nothing
       subscribes :run, "remote_file[omnibus_remote [#{File.basename(remote_path)}]]", :immediately
       notifies :restart, 'service[chef-client]', :immediately if node['omnibus_updater']['restart_chef_service']
       notifies :create, 'ruby_block[omnibus chef killer]', :immediately
-      only_if { node['chef_packages']['chef']['version'] != node['omnibus_updater']['version'] }
-    end
+    end if node['chef_packages']['chef']['version'] != node['omnibus_updater']['version']
   when '.dmg'
     dmg_package 'Chef Client' do
       volumes_dir 'Chef Client'
       app ::File.basename(remote_path, '.dmg')
       file ::File.join(node['omnibus_updater']['cache_dir'], ::File.basename(remote_path))
       type 'pkg'
-      action :install
+      action :nothing
       subscribes :install, "remote_file[omnibus_remote [#{File.basename(remote_path)}]]", :immediately
       notifies :restart, 'service[chef-client]', :immediately if node['omnibus_updater']['restart_chef_service']
       notifies :create, 'ruby_block[omnibus chef killer]', :immediately
-      only_if { node['chef_packages']['chef']['version'] != node['omnibus_updater']['version'] }
-    end
+    end if node['chef_packages']['chef']['version'] != node['omnibus_updater']['version']
   else
     package 'chef' do
-      allow_downgrade true if node['platfrom'].eql?('centos')
+      allow_downgrade true if node['platfrom'].eql?('centos') && !node['omnibus_updater']['prevent_downgrade']
       installer_type :msi if node['platfrom'].eql?('windows')
       version node['omnibus_updater']['version'] unless node['platfrom'].eql?('windows')
       source ::File.join(node['omnibus_updater']['cache_dir'], ::File.basename(remote_path))
       provider value_for_platform_family(debian: Chef::Provider::Package::Dpkg)
-      action node['platfrom'].eql?('windows') ? :install : :upgrade
-      subscribes :upgrade, "remote_file[omnibus_remote [#{File.basename(remote_path)}]]", :immediately
+      action :nothing
+      subscribes node['platfrom'].eql?('windows') ? :install : :upgrade, "remote_file[omnibus_remote [#{File.basename(remote_path)}]]", :immediately
       notifies :restart, 'service[chef-client]', :immediately if node['omnibus_updater']['restart_chef_service']
       notifies :create, 'ruby_block[omnibus chef killer]', :immediately
-      only_if { node['chef_packages']['chef']['version'] != node['omnibus_updater']['version'] }
-    end
+      options 'downgrade' if node['platfrom'].eql?('centos')
+      #if node['omnibus_updater']['version'] < node['chef_packages']['chef']['version'] && node['platfrom'].eql?('centos')
+    end if node['chef_packages']['chef']['version'] != node['omnibus_updater']['version']
 end
 
 include_recipe 'omnibus_updater::old_package_cleaner'

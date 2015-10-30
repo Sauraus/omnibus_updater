@@ -9,8 +9,6 @@ provisioner:
 
 platforms:
   - name: centos-6.6
-  - name: centos-7.0
-  - name: ubuntu-12.04
   - name: ubuntu-14.04
   - name: macosx-10.10
     driver:
@@ -38,3 +36,11 @@ suites:
       omnibus_updater:
         version: '12.3.0'
         kill_chef_on_upgrade: false
+  - name: nodowngrade
+    run_list:
+      recipe[omnibus_updater::default]
+    attributes:
+      omnibus_updater:
+        version: '12.3.0'
+        kill_chef_on_upgrade: false
+        prevent_downgrade: true
